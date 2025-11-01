@@ -1,0 +1,251 @@
+/* Dark Theme Configuration for Bulma */
+:root {
+    /* Custom dark theme colors */
+    --dark-bg: #1b2636;
+    --dark-bg-light: #2d3748;
+    --dark-bg-lighter: #3a4556;
+    --dark-text: #e2e8f0;
+    --dark-text-muted: #a0aec0;
+    --dark-border: #4a5568;
+
+    /* Override Bulma variables */
+    --bulma-scheme-main: var(--dark-bg);
+    --bulma-background: var(--dark-bg);
+    --bulma-text: var(--dark-text);
+    --bulma-text-strong: var(--dark-text);
+    --bulma-border: var(--dark-border);
+}
+
+@font-face {
+    font-family: "Nunito";
+    font-style: normal;
+    font-weight: 400;
+    src: local(""),
+    url("assets/fonts/nunito-v16-latin-regular.woff2") format("woff2");
+}
+
+html {
+    background-color: var(--dark-bg);
+    color: var(--dark-text);
+}
+
+body {
+    margin: 0;
+    color: var(--dark-text);
+    background-color: var(--dark-bg);
+    font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+    "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+}
+
+#app {
+    height: 100vh;
+}
+
+/* Dark theme for Bulma components */
+.box {
+    background-color: var(--dark-bg-light);
+    color: var(--dark-text);
+    border: 1px solid var(--dark-border);
+}
+
+.button {
+    background-color: var(--dark-bg-lighter);
+    color: var(--dark-text);
+    border-color: var(--dark-border);
+}
+
+.button:hover {
+    background-color: var(--dark-bg-light);
+}
+
+.button.is-primary {
+    background-color: #3273dc;
+    border-color: transparent;
+    color: white;
+}
+
+.button.is-primary:hover {
+    background-color: #2366d1;
+}
+
+.menu-list a {
+    color: var(--dark-text);
+}
+
+.menu-list a:hover {
+    background-color: var(--dark-bg-lighter);
+    color: var(--dark-text);
+}
+
+.menu-list a.is-active {
+    background-color: #3273dc;
+    color: white;
+}
+
+.navbar {
+    background-color: var(--dark-bg-light);
+    border-bottom: 1px solid var(--dark-border);
+}
+
+.navbar-item, .navbar-link {
+    color: var(--dark-text);
+}
+
+.navbar-item:hover, .navbar-link:hover {
+    background-color: var(--dark-bg-lighter);
+    color: var(--dark-text);
+}
+
+.notification {
+    background-color: var(--dark-bg-light);
+    color: var(--dark-text);
+}
+
+.notification.is-success {
+    background-color: #48c774;
+    color: white;
+}
+
+.notification.is-danger {
+    background-color: #f14668;
+    color: white;
+}
+
+.title, .subtitle {
+    color: var(--dark-text);
+}
+
+.section {
+    background-color: var(--dark-bg);
+}
+
+/* Data grid dark theme styling */
+.dsg-container {
+    background-color: var(--dark-bg-light);
+    border: 1px solid var(--dark-border);
+}
+
+.dsg-cell {
+    background-color: var(--dark-bg-light);
+    color: var(--dark-text);
+    border-color: var(--dark-border);
+}
+
+.dsg-cell-header {
+    background-color: var(--dark-bg-lighter);
+    color: var(--dark-text);
+    font-weight: 600;
+    border-color: var(--dark-border);
+}
+
+.dsg-cell:focus {
+    outline: 2px solid #3273dc;
+    outline-offset: -2px;
+}
+
+.dsg-row:nth-child(even) .dsg-cell {
+    background-color: rgba(255, 255, 255, 0.02);
+}
+
+.dsg-row:hover .dsg-cell {
+    background-color: var(--dark-bg-lighter);
+}
+
+.dsg-cell-gutter {
+    background-color: var(--dark-bg-lighter);
+    color: var(--dark-text-muted);
+    border-color: var(--dark-border);
+}
+
+.dsg-cell-gutter-active {
+    background-color: #3273dc;
+    color: white;
+}
+
+/* Icon text spacing */
+.icon-text {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Smooth transitions */
+.box, .button, .notification, .menu-list a {
+    transition: all 0.2s ease;
+}
+
+/* Scrollbar styling for dark theme */
+::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--dark-bg);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--dark-bg-lighter);
+    border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--dark-border);
+}
+
+/* Better focus states for accessibility */
+button:focus-visible,
+a:focus-visible {
+    outline: 2px solid #3273dc;
+    outline-offset: 2px;
+}
+
+/* Improve readability */
+.has-text-grey {
+    color: var(--dark-text-muted) !important;
+}
+
+.has-text-grey-light {
+    color: var(--dark-text-muted) !important;
+}
+
+/* Navbar burger button */
+.navbar-burger {
+    color: var(--dark-text) !important;
+    border: 1px solid var(--dark-border) !important;
+    background: var(--dark-bg-lighter) !important;
+    margin: 0.5rem;
+    height: 3rem;
+    width: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.navbar-burger:hover {
+    background-color: var(--dark-border) !important;
+    color: var(--dark-text) !important;
+}
+
+.navbar-burger:focus {
+    outline: 2px solid #3273dc;
+    outline-offset: 2px;
+}
+
+.navbar-burger .icon {
+    color: var(--dark-text);
+    font-size: 1.25rem;
+}
+
+.button.is-ghost {
+    background: none;
+    border: none;
+    color: var(--dark-text);
+}
+
+.button.is-ghost:hover {
+    background-color: var(--dark-bg-lighter);
+    color: var(--dark-text);
+}
