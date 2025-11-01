@@ -6,7 +6,7 @@ import { OnFileDrop, OnFileDropOff } from "../wailsjs/runtime";
 import Editor, { Monaco } from "@monaco-editor/react";
 import { editor } from "monaco-editor";
 import SchemaViewer from "./components/SchemaViewer";
-import TableView from "./components/TableView";
+import QueryResults from "./components/QueryResults";
 
 interface Table {
   name: string;
@@ -278,28 +278,13 @@ function App() {
             </div>
           )}
 
-          {/* Results or Empty State */}
+          {/* Results with Table/Chart Toggle */}
           {!queryLoading && !queryError && (
-            <TableView
+            <QueryResults
               data={data}
               columns={columns}
               onDataChange={setData}
             />
-          )}
-
-          {columns.length > 0 && data.length === 0 && !queryLoading && !queryError && (
-            <div
-              className="box mt-4 has-text-centered"
-              style={{ padding: "3rem" }}
-            >
-              <div className="mb-4">
-                <i className="fas fa-info-circle fa-3x has-text-info"></i>
-              </div>
-              <p className="title is-5">Query returned 0 rows</p>
-              <p className="subtitle is-6 has-text-grey">
-                Your query executed successfully but returned no results
-              </p>
-            </div>
           )}
         </div>
       </div>

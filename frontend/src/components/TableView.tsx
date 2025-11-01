@@ -18,31 +18,14 @@ export default function TableView({ data, columns, onDataChange }: TableViewProp
   };
 
   if (!data || data.length === 0 || !columns || columns.length === 0) {
-    return (
-      <div className="box mt-4 has-text-centered" style={{ padding: "3rem" }}>
-        <div className="mb-4">
-          <i className="fas fa-table fa-3x has-text-grey-light"></i>
-        </div>
-        <p className="title is-5 has-text-grey-light">No Results Yet</p>
-        <p className="subtitle is-6 has-text-grey">
-          Write a SQL query and click <strong>Run Query</strong> to see results
-        </p>
-      </div>
-    );
+    return null;
   }
 
   return (
-    <div className="box mt-4">
-      <h3 className="title is-5 mb-3">
-        Query Results ({data.length} rows)
-      </h3>
-      <div className="data-grid-container">
-        <DataSheetGrid
-          value={data}
-          onChange={handleDataChange}
-          columns={columnsData}
-        />
-      </div>
-    </div>
+    <DataSheetGrid
+      value={data}
+      onChange={handleDataChange}
+      columns={columnsData}
+    />
   );
 }

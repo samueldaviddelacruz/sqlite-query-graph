@@ -1,0 +1,127 @@
+import { useState, useEffect } from "react";
+import { ChartConfig } from "../types/chart";
+import { analyzeQueryData } from "../utils/dataAnalysis";
+import { autoGenerateChartConfig } from "../utils/chartHelpers";
+import ResultsToolbar from "./ResultsToolbar";
+import TableView from "./TableView";
+import ChartView from "./ChartView";
+
+type ViewMode = 'table' | 'chart';
+
+interface QueryResultsProps {
+  data: any[];
+  columns: string[];
+  onDataChange?: (data: any[]) => void;
+}
+
+export default function QueryResults({ data, columns, onDataChange }: QueryResultsProps) {
+  const [viewMode, setViewMode] = useState<ViewMode>('table');
+  const [chartConfig, setChartConfig] = useState<ChartConfig>({
+    type: 'bar',
+    xAxis: '',
+    yAxis: [],
+    showLegend: true,
+    showGrid: true,
+  });
+
+  // Analyze data whenever it changes
+  const graphableData = analyzeQueryData(columns, data);
+
+  // Auto-configure chart when data changes or when switching to chart view
+  useEffect(() => {
+    if (graphableData.canGraph && data.length > 0 && columns.length > 0) {
+      const autoConfig = autoGenerateChartConfig(
+        columns,
+        data,
+        graphableData.numericColumns,
+        graphableData.categoricalColumns,
+        graphableData.recommendedChartType
+      );
+      setChartConfig(autoConfig);
+    }
+  }, [data, columns, graphableData.canGraph]);
+
+  // If data becomes non-graphable, switch back to table view
+  useEffect(() => {
+    if (!graphableData.canGraph && viewMode === 'chart') {
+      setViewMode('table');
+    }
+  }, [graphableData.canGraph, viewMode]);
+
+  const handleViewModeChange = (mode: ViewMode) => {
+    setViewMode(mode);
+  };
+
+  const handleChartConfigChange = (config: ChartConfig) => {
+    setChartConfig(config);
+  };
+
+  // Don't render anything if there's no data
+  if (!data || data.length === 0 || !columns || columns.length === 0) {
+    return (
+      <div className="box mt-4 has-text-centered" style={{ padding: "3rem" }}>
+        <div className="mb-4">
+          <i className="fas fa-table fa-3x has-text-grey-light"></i>
+        </div>
+        <p className="title is-5 has-text-grey-light">No Results Yet</p>
+        <p className="subtitle is-6 has-text-grey">
+          Write a SQL query and click <strong>Run Query</strong> to see results
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-4">
+      {/* Toolbar with view toggle and chart config */}
+      <ResultsToolbar
+        viewMode={viewMode}
+        onViewModeChange={handleViewModeChange}
+        chartConfig={chartConfig}
+        onChartConfigChange={handleChartConfigChange}
+        graphableData={graphableData}
+        columns={columns}
+      />
+
+      {/* Results Display - Table or Chart */}
+      <div
+        className="box"
+        style={{
+          borderTopLeftRadius: 0,
+          borderTopRightRadius: 0,
+          marginTop: 0,
+          paddingTop: '1.5rem',
+        }}
+      >
+        {viewMode === 'table' ? (
+          <>
+            <h3 className="title is-5 mb-3">
+              Query Results ({data.length} rows)
+            </h3>
+            <div className="data-grid-container">
+              <TableView data={data} columns={columns} onDataChange={onDataChange} />
+            </div>
+          </>
+        ) : (
+          <ChartView data={data} columns={columns} config={chartConfig} />
+        )}
+      </div>
+
+      {/* Empty results message */}
+      {data.length === 0 && columns.length > 0 && (
+        <div
+          className="box mt-4 has-text-centered"
+          style={{ padding: "3rem" }}
+        >
+          <div className="mb-4">
+            <i className="fas fa-info-circle fa-3x has-text-info"></i>
+          </div>
+          <p className="title is-5">Query returned 0 rows</p>
+          <p className="subtitle is-6 has-text-grey">
+            Your query executed successfully but returned no results
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
