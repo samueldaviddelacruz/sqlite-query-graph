@@ -7,6 +7,7 @@ import Editor, { Monaco } from "@monaco-editor/react";
 import { editor } from "monaco-editor";
 import SchemaViewer from "./components/SchemaViewer";
 import QueryResults from "./components/QueryResults";
+import { generateSelectStatement, quoteIdentifier } from "./utils/sqlHelpers";
 
 interface Table {
   name: string;
@@ -70,8 +71,8 @@ function App() {
   }
 
   const handleTableClick = (tableName: string) => {
-    // Insert SELECT statement into editor
-    const selectStatement = `SELECT * FROM ${tableName} LIMIT 100;`;
+    // Insert SELECT statement into editor with properly quoted table name
+    const selectStatement = generateSelectStatement(tableName, 100);
     if (editorRef.current) {
       const currentValue = editorRef.current.getValue();
       const newValue = currentValue
@@ -82,7 +83,8 @@ function App() {
   };
 
   const handleColumnClick = (columnName: string) => {
-    // Insert column name at cursor position
+    // Insert column name at cursor position with proper quoting
+    const quotedColumn = quoteIdentifier(columnName);
     if (editorRef.current) {
       const position = editorRef.current.getPosition();
       editorRef.current.executeEdits("", [
@@ -93,7 +95,7 @@ function App() {
             endLineNumber: position?.lineNumber || 1,
             endColumn: position?.column || 1,
           },
-          text: columnName,
+          text: quotedColumn,
         },
       ]);
       editorRef.current.focus();

@@ -95,3 +95,9 @@ go mod tidy      # Clean up go.mod/go.sum
 - Editor reference stored in `editorRef` for programmatic access
 - Table clicks append SELECT statements to editor
 - Column clicks insert column name at cursor position
+
+### SQLite Identifier Quoting
+- Table and column names with spaces or special characters must be properly quoted
+- Backend uses `quoteIdentifier()` helper (app.go:41) to wrap identifiers in double quotes
+- Frontend uses `quoteIdentifier()` and `generateSelectStatement()` helpers (utils/sqlHelpers.ts)
+- Double quotes within identifiers are escaped by doubling them (`"` becomes `""`)

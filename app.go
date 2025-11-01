@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/jmoiron/sqlx"
 	_ "modernc.org/sqlite"
@@ -33,6 +34,15 @@ type QueryResult struct {
 func NewApp() *App {
 
 	return &App{}
+}
+
+// quoteIdentifier quotes a SQLite identifier (table/column name) properly
+// to handle names with spaces, special characters, or reserved keywords
+func quoteIdentifier(name string) string {
+	// Escape any existing double quotes by doubling them
+	escaped := strings.ReplaceAll(name, `"`, `""`)
+	// Wrap in double quotes
+	return fmt.Sprintf(`"%s"`, escaped)
 }
 
 // startup is called when the app starts. The context is saved
@@ -71,7 +81,8 @@ func (a *App) GetTableSchema(tableName string) ([]ColumnInfo, error) {
 	}
 
 	var rows []pragmaRow
-	query := fmt.Sprintf("PRAGMA table_info(%s)", tableName)
+	// Quote the table name to handle spaces and special characters
+	query := fmt.Sprintf("PRAGMA table_info(%s)", quoteIdentifier(tableName))
 	err := a.db.Select(&rows, query)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get table schema: %w", err)
