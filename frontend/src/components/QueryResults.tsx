@@ -15,7 +15,16 @@ interface QueryResultsProps {
 }
 
 export default function QueryResults({ data, columns, onDataChange }: QueryResultsProps) {
-  const [viewMode, setViewMode] = useState<ViewMode>('table');
+  // Load view mode from localStorage or default to 'table'
+  const [viewMode, setViewMode] = useState<ViewMode>(() => {
+    try {
+      const savedMode = localStorage.getItem('queryResultsViewMode');
+      return (savedMode === 'chart' || savedMode === 'table') ? savedMode : 'table';
+    } catch {
+      return 'table';
+    }
+  });
+
   const [chartConfig, setChartConfig] = useState<ChartConfig>({
     type: 'bar',
     xAxis: '',
@@ -23,6 +32,7 @@ export default function QueryResults({ data, columns, onDataChange }: QueryResul
     showLegend: true,
     showGrid: true,
   });
+  const [showAutoConfigNotification, setShowAutoConfigNotification] = useState(false);
 
   // Analyze data whenever it changes
   const graphableData = analyzeQueryData(columns, data);
@@ -38,6 +48,12 @@ export default function QueryResults({ data, columns, onDataChange }: QueryResul
         graphableData.recommendedChartType
       );
       setChartConfig(autoConfig);
+
+      // Show notification that chart was auto-configured
+      if (viewMode === 'chart') {
+        setShowAutoConfigNotification(true);
+        setTimeout(() => setShowAutoConfigNotification(false), 5000);
+      }
     }
   }, [data, columns, graphableData.canGraph]);
 
@@ -50,6 +66,12 @@ export default function QueryResults({ data, columns, onDataChange }: QueryResul
 
   const handleViewModeChange = (mode: ViewMode) => {
     setViewMode(mode);
+    // Persist view mode preference
+    try {
+      localStorage.setItem('queryResultsViewMode', mode);
+    } catch (error) {
+      console.warn('Failed to save view mode preference:', error);
+    }
   };
 
   const handleChartConfigChange = (config: ChartConfig) => {
@@ -82,6 +104,15 @@ export default function QueryResults({ data, columns, onDataChange }: QueryResul
         graphableData={graphableData}
         columns={columns}
       />
+
+      {/* Auto-configuration notification */}
+      {showAutoConfigNotification && viewMode === 'chart' && (
+        <div className="notification is-success is-light" style={{ marginBottom: 0, borderRadius: 0 }}>
+          <button className="delete" onClick={() => setShowAutoConfigNotification(false)}></button>
+          <strong>✨ Chart Auto-Configured!</strong> We've selected a {chartConfig.type} chart with {chartConfig.xAxis} on X-axis
+          and {chartConfig.yAxis.join(', ')} on Y-axis. Adjust the settings above if needed.
+        </div>
+      )}
 
       {/* Results Display - Table or Chart */}
       <div

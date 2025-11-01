@@ -64,21 +64,43 @@ export function analyzeColumn(data: any[], columnName: string): ColumnAnalysis {
     };
   }
 
-  const numericCount = values.filter(val => typeof val === 'number').length;
-  const isNumeric = numericCount / values.length > 0.8; // 80% numeric threshold
+  // Check for numeric values (including numbers stored as strings)
+  const numericCount = values.filter(val => {
+    if (typeof val === 'number') return true;
+    // Check if string can be parsed as number
+    if (typeof val === 'string') {
+      const trimmed = val.trim();
+      return !isNaN(Number(trimmed)) && trimmed !== '';
+    }
+    return false;
+  }).length;
+
+  // Require at least 80% numeric values, but account for sparse data
+  const isNumeric = numericCount / values.length > 0.8 && values.length > 0;
+
+  // Check for boolean values
+  const booleanCount = values.filter(val =>
+    typeof val === 'boolean' ||
+    (typeof val === 'string' && ['true', 'false', 'yes', 'no', '1', '0'].includes(val.toLowerCase()))
+  ).length;
+  const isBoolean = booleanCount / values.length > 0.8;
 
   // Check for date/time patterns
-  const isDateTime = !isNumeric && values.some(val =>
+  const isDateTime = !isNumeric && !isBoolean && values.some(val =>
     typeof val === 'string' && isDateTimeString(val)
   );
 
   const uniqueValues = new Set(values);
   const uniqueValueCount = uniqueValues.size;
 
-  // A column is categorical if it's not numeric and has relatively few unique values
-  // or if it has a low unique-to-total ratio
-  const isCategorical = !isNumeric && !isDateTime && (
-    uniqueValueCount <= 20 || uniqueValueCount / values.length < 0.5
+  // A column is categorical if it's not numeric/boolean/datetime and has:
+  // - Relatively few unique values (≤20), OR
+  // - Low unique-to-total ratio (<0.5), OR
+  // - Is boolean
+  const isCategorical = (!isNumeric && !isDateTime) && (
+    isBoolean ||
+    uniqueValueCount <= 20 ||
+    uniqueValueCount / values.length < 0.5
   );
 
   return {
@@ -95,9 +117,22 @@ export function analyzeColumn(data: any[], columnName: string): ColumnAnalysis {
  * Checks if a string value appears to be a date/time
  */
 function isDateTimeString(value: string): boolean {
-  // Simple heuristic: try to parse as date
+  if (!value || typeof value !== 'string') return false;
+
+  // Common date/time patterns
+  const datePatterns = [
+    /^\d{4}[-/]\d{2}[-/]\d{2}/, // YYYY-MM-DD or YYYY/MM/DD
+    /^\d{2}[-/]\d{2}[-/]\d{4}/, // DD-MM-YYYY or MM-DD-YYYY
+    /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/, // ISO 8601
+    /^\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}/, // SQL datetime
+  ];
+
+  const matchesPattern = datePatterns.some(pattern => pattern.test(value));
+  if (!matchesPattern) return false;
+
+  // Verify it can be parsed as a valid date
   const date = new Date(value);
-  return !isNaN(date.getTime()) && value.match(/\d{4}[-/]\d{2}[-/]\d{2}|^\d{4}-\d{2}-\d{2}/) !== null;
+  return !isNaN(date.getTime());
 }
 
 /**
