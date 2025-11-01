@@ -25,14 +25,33 @@ export default function QueryResults({ data, columns, onDataChange }: QueryResul
     }
   });
 
-  const [chartConfig, setChartConfig] = useState<ChartConfig>({
-    type: 'bar',
-    xAxis: '',
-    yAxis: [],
-    showLegend: true,
-    showGrid: true,
+  const [chartConfig, setChartConfig] = useState<ChartConfig>(() => {
+    // Load chart preferences from localStorage (type, legend, grid only)
+    try {
+      const savedPrefs = localStorage.getItem('chartPreferences');
+      if (savedPrefs) {
+        const prefs = JSON.parse(savedPrefs);
+        return {
+          type: prefs.type || 'bar',
+          xAxis: '',
+          yAxis: [],
+          showLegend: prefs.showLegend !== undefined ? prefs.showLegend : true,
+          showGrid: prefs.showGrid !== undefined ? prefs.showGrid : true,
+        };
+      }
+    } catch {
+      // Fall through to default
+    }
+    return {
+      type: 'bar',
+      xAxis: '',
+      yAxis: [],
+      showLegend: true,
+      showGrid: true,
+    };
   });
   const [showAutoConfigNotification, setShowAutoConfigNotification] = useState(false);
+  const [isChartLoading, setIsChartLoading] = useState(false);
 
   // Analyze data whenever it changes
   const graphableData = analyzeQueryData(columns, data);
@@ -65,6 +84,12 @@ export default function QueryResults({ data, columns, onDataChange }: QueryResul
   }, [graphableData.canGraph, viewMode]);
 
   const handleViewModeChange = (mode: ViewMode) => {
+    // Show brief loading state when switching to chart
+    if (mode === 'chart' && viewMode === 'table' && data.length > 100) {
+      setIsChartLoading(true);
+      setTimeout(() => setIsChartLoading(false), 300);
+    }
+
     setViewMode(mode);
     // Persist view mode preference
     try {
@@ -76,6 +101,18 @@ export default function QueryResults({ data, columns, onDataChange }: QueryResul
 
   const handleChartConfigChange = (config: ChartConfig) => {
     setChartConfig(config);
+
+    // Save chart preferences to localStorage (type, legend, grid only)
+    try {
+      const prefs = {
+        type: config.type,
+        showLegend: config.showLegend,
+        showGrid: config.showGrid,
+      };
+      localStorage.setItem('chartPreferences', JSON.stringify(prefs));
+    } catch (error) {
+      console.warn('Failed to save chart preferences:', error);
+    }
   };
 
   // Don't render anything if there's no data
@@ -133,6 +170,13 @@ export default function QueryResults({ data, columns, onDataChange }: QueryResul
               <TableView data={data} columns={columns} onDataChange={onDataChange} />
             </div>
           </>
+        ) : isChartLoading ? (
+          <div className="has-text-centered" style={{ padding: "3rem" }}>
+            <div className="mb-4">
+              <i className="fas fa-spinner fa-spin fa-3x has-text-primary"></i>
+            </div>
+            <p className="has-text-grey">Preparing chart...</p>
+          </div>
         ) : (
           <ChartView data={data} columns={columns} config={chartConfig} />
         )}

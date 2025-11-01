@@ -93,6 +93,10 @@ export default function ChartView({ data, columns, config }: ChartViewProps) {
   // Show warning if data was limited
   const dataWasLimited = chartData.length > limitedData.length;
 
+  // Determine warning severity based on original data size
+  const isVeryLargeDataset = chartData.length > 5000;
+  const warningLevel = isVeryLargeDataset ? 'danger' : 'warning';
+
   // Render the appropriate chart based on type
   const renderChart = () => {
     const commonProps = {
@@ -143,10 +147,14 @@ export default function ChartView({ data, columns, config }: ChartViewProps) {
       </div>
 
       {dataWasLimited && (
-        <div className="notification is-warning is-light mb-4">
+        <div className={`notification is-${warningLevel} is-light mb-4`}>
           <button className="delete"></button>
-          <strong>Performance Notice:</strong> Showing {limitedData.length} of {chartData.length} data points.
-          Large datasets are sampled for better performance.
+          <strong>{isVeryLargeDataset ? '⚠️ Large Dataset Warning:' : 'Performance Notice:'}</strong> Showing {limitedData.length} of {chartData.length.toLocaleString()} data points.
+          {isVeryLargeDataset ? (
+            <> The dataset is very large and has been heavily sampled. Consider adding filters to your SQL query for more meaningful visualizations.</>
+          ) : (
+            <> Data has been sampled for better chart performance.</>
+          )}
         </div>
       )}
 

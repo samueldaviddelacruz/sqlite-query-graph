@@ -10,6 +10,7 @@ import {
 } from "recharts";
 import { ChartData } from "../../types/chart";
 import { getChartColor } from "../../utils/chartHelpers";
+import CustomTooltip from "./CustomTooltip";
 
 interface LineChartProps {
   data: ChartData[];
@@ -47,13 +48,7 @@ export default function LineChart({
           height={data.length > 15 ? 100 : 60}
         />
         <YAxis stroke="#4a5568" tick={{ fill: "#4a5568" }} />
-        <Tooltip
-          contentStyle={{
-            backgroundColor: "#fff",
-            border: "1px solid #dbdbdb",
-            borderRadius: "4px",
-          }}
-        />
+        <Tooltip content={<CustomTooltip />} />
         {showLegend && yAxisKeys.length > 1 && (
           <Legend wrapperStyle={{ paddingTop: "20px" }} />
         )}

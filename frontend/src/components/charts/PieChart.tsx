@@ -8,6 +8,7 @@ import {
 } from "recharts";
 import { ChartData } from "../../types/chart";
 import { CHART_COLORS } from "../../utils/chartHelpers";
+import CustomTooltip from "./CustomTooltip";
 
 interface PieChartProps {
   data: ChartData[];
@@ -60,13 +61,7 @@ export default function PieChart({
             <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
           ))}
         </Pie>
-        <Tooltip
-          contentStyle={{
-            backgroundColor: "#fff",
-            border: "1px solid #dbdbdb",
-            borderRadius: "4px",
-          }}
-        />
+        <Tooltip content={<CustomTooltip />} />
         {showLegend && (
           <Legend
             verticalAlign="bottom"

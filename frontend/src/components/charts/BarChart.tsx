@@ -10,6 +10,7 @@ import {
 } from "recharts";
 import { ChartData } from "../../types/chart";
 import { getChartColor } from "../../utils/chartHelpers";
+import CustomTooltip from "./CustomTooltip";
 
 interface BarChartProps {
   data: ChartData[];
@@ -48,11 +49,7 @@ export default function BarChart({
         />
         <YAxis stroke="#4a5568" tick={{ fill: "#4a5568" }} />
         <Tooltip
-          contentStyle={{
-            backgroundColor: "#fff",
-            border: "1px solid #dbdbdb",
-            borderRadius: "4px",
-          }}
+          content={<CustomTooltip />}
           cursor={{ fill: "rgba(50, 115, 220, 0.1)" }}
         />
         {showLegend && yAxisKeys.length > 1 && (

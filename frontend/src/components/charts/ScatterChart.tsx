@@ -11,6 +11,7 @@ import {
 } from "recharts";
 import { ChartData } from "../../types/chart";
 import { getChartColor } from "../../utils/chartHelpers";
+import CustomTooltip from "./CustomTooltip";
 
 interface ScatterChartProps {
   data: ChartData[];
@@ -65,11 +66,7 @@ export default function ScatterChart({
         <ZAxis range={[60, 60]} />
         <Tooltip
           cursor={{ strokeDasharray: "3 3" }}
-          contentStyle={{
-            backgroundColor: "#fff",
-            border: "1px solid #dbdbdb",
-            borderRadius: "4px",
-          }}
+          content={<CustomTooltip />}
         />
         {showLegend && yAxisKeys.length > 1 && (
           <Legend wrapperStyle={{ paddingTop: "20px" }} />
